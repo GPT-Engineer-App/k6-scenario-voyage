@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Cat, Heart, Info, Paw, Star, ChevronLeft, ChevronRight, Moon, Sun } from "lucide-react";
+import { Cat, Heart, Info, Paw, Star, ChevronLeft, ChevronRight, Moon, Sun, Sparkles, Camera } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,6 +11,9 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Switch } from "@/components/ui/switch";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 const catBreeds = [
   { name: "Siamese", origin: "Thailand", temperament: "Vocal, Intelligent, Social", image: "https://upload.wikimedia.org/wikipedia/commons/2/25/Siam_lilacpoint.jpg" },
@@ -83,11 +86,15 @@ const Index = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [progress, setProgress] = useState(13);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [catName, setCatName] = useState("");
 
   const catImages = [
     "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg",
     "https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg",
     "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Orange_tabby_cat_sitting_on_fallen_leaves-Hisashi-01A.jpg/1280px-Orange_tabby_cat_sitting_on_fallen_leaves-Hisashi-01A.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Kittyply_edit1.jpg/1280px-Kittyply_edit1.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Sleeping_cat_on_her_back.jpg/1280px-Sleeping_cat_on_her_back.jpg",
   ];
 
   const catPopulationData = [
@@ -114,6 +121,14 @@ const Index = () => {
     });
   };
 
+  const handleNameCat = () => {
+    const catNames = ["Whiskers", "Luna", "Milo", "Bella", "Oliver", "Lucy", "Leo", "Nala", "Charlie", "Lily"];
+    const randomName = catNames[Math.floor(Math.random() * catNames.length)];
+    setCatName(randomName);
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
+  };
+
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-b from-purple-100 to-pink-100'} p-8 transition-colors duration-300`}>
       <div className="max-w-4xl mx-auto">
@@ -132,6 +147,16 @@ const Index = () => {
             <Moon className="h-4 w-4 ml-2" />
           </div>
         </div>
+
+        {showAlert && (
+          <Alert className="mb-4">
+            <Sparkles className="h-4 w-4" />
+            <AlertTitle>New Cat Named!</AlertTitle>
+            <AlertDescription>
+              You've named this cat {catName}. What a purr-fect choice!
+            </AlertDescription>
+          </Alert>
+        )}
         
         <motion.div
           className="relative mb-8"
@@ -163,13 +188,41 @@ const Index = () => {
           >
             <ChevronRight className="h-6 w-6" />
           </Button>
+          <Button
+            className={`absolute bottom-4 right-4 ${isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-pink-500 hover:bg-pink-600'} text-white`}
+            onClick={handleNameCat}
+          >
+            <Sparkles className="mr-2 h-4 w-4" /> Name this cat
+          </Button>
         </motion.div>
+
+        <div className="flex justify-center space-x-2 mb-8">
+          {catImages.map((_, index) => (
+            <motion.div
+              key={index}
+              className={`w-3 h-3 rounded-full ${currentImageIndex === index ? (isDarkMode ? 'bg-purple-500' : 'bg-pink-500') : 'bg-gray-300'}`}
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.8 }}
+              onClick={() => setCurrentImageIndex(index)}
+            />
+          ))}
+        </div>
 
         <Card className={`mb-8 ${isDarkMode ? 'bg-gray-800' : 'bg-white/80 backdrop-blur-sm'}`}>
           <CardContent className="pt-6">
-            <p className={`text-xl mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              Cats are fascinating creatures that have been domesticated for thousands of years. They are known for their independence, agility, and affectionate nature.
-            </p>
+            <div className="flex items-start mb-4">
+              <Avatar className="mr-4">
+                <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/RedCat_8727.jpg/1280px-RedCat_8727.jpg" alt="Cat Avatar" />
+                <AvatarFallback>CT</AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className={`text-2xl font-semibold mb-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-800'}`}>Cat Facts</h3>
+                <p className={`text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Cats are fascinating creatures that have been domesticated for thousands of years. They are known for their independence, agility, and affectionate nature.
+                </p>
+              </div>
+            </div>
+            <Separator className="my-4" />
             <motion.div 
               className="flex justify-center items-center"
               whileHover={{ scale: 1.1 }}
@@ -177,12 +230,12 @@ const Index = () => {
             >
               <Button 
                 variant="outline" 
-                className={`flex items-center ${isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : ''}`}
+                className={`flex items-center ${isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-pink-500 hover:bg-pink-600'} text-white`}
                 onClick={() => setLikes(likes + 1)}
               >
-                <Heart className="mr-2" fill={likes > 0 ? "red" : "none"} color={likes > 0 ? "red" : "currentColor"} /> Like
+                <Heart className="mr-2" fill={likes > 0 ? "white" : "none"} color="white" /> Like
               </Button>
-              <span className="ml-2 text-lg font-semibold">{likes}</span>
+              <span className="ml-2 text-lg font-semibold">{likes} Likes</span>
             </motion.div>
           </CardContent>
         </Card>
@@ -290,6 +343,12 @@ const Index = () => {
             <Star className="mr-2" /> More Cat Facts
           </Button>
         </motion.div>
+
+        <footer className="mt-12 text-center">
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            © 2023 Feline Fascination. All rights reserved. Created with <Heart className="inline-block h-4 w-4 text-red-500" /> by cat lovers.
+          </p>
+        </footer>
       </div>
     </div>
   );
