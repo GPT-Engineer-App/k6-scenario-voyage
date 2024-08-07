@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Cat, Heart, Info, Paw, Star } from "lucide-react";
+import { Cat, Heart, Info, Paw, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const catBreeds = [
   { name: "Siamese", origin: "Thailand", temperament: "Vocal, Intelligent, Social", image: "https://upload.wikimedia.org/wikipedia/commons/2/25/Siam_lilacpoint.jpg" },
@@ -18,21 +19,26 @@ const catBreeds = [
 ];
 
 const CatBreedCard = ({ breed }) => (
-  <Card className="mb-4 overflow-hidden">
-    <img src={breed.image} alt={breed.name} className="w-full h-48 object-cover" />
-    <CardHeader>
-      <CardTitle>{breed.name}</CardTitle>
-      <CardDescription>Origin: {breed.origin}</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <p><strong>Temperament:</strong> {breed.temperament}</p>
-    </CardContent>
-    <CardFooter>
-      <Button variant="outline" className="w-full">
-        <Paw className="mr-2 h-4 w-4" /> Learn More
-      </Button>
-    </CardFooter>
-  </Card>
+  <motion.div
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+  >
+    <Card className="mb-4 overflow-hidden shadow-lg transition-shadow duration-300 hover:shadow-xl">
+      <img src={breed.image} alt={breed.name} className="w-full h-48 object-cover transition-transform duration-300 hover:scale-110" />
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">{breed.name}</CardTitle>
+        <CardDescription className="text-sm text-gray-500">Origin: {breed.origin}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-gray-700"><strong>Temperament:</strong> {breed.temperament}</p>
+      </CardContent>
+      <CardFooter>
+        <Button variant="outline" className="w-full group">
+          <Paw className="mr-2 h-4 w-4 transition-transform group-hover:rotate-12" /> Learn More
+        </Button>
+      </CardFooter>
+    </Card>
+  </motion.div>
 );
 
 const FactCarousel = () => {
@@ -45,13 +51,20 @@ const FactCarousel = () => {
   ];
 
   return (
-    <Carousel className="w-full max-w-xs">
+    <Carousel className="w-full max-w-md">
       <CarouselContent>
         {facts.map((fact, index) => (
           <CarouselItem key={index}>
-            <Card>
-              <CardContent className="flex items-center justify-center p-6">
-                <p className="text-center">{fact}</p>
+            <Card className="bg-gradient-to-r from-purple-400 to-pink-500 text-white">
+              <CardContent className="flex items-center justify-center p-8 h-40">
+                <motion.p 
+                  className="text-center text-lg font-semibold"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {fact}
+                </motion.p>
               </CardContent>
             </Card>
           </CarouselItem>
@@ -79,8 +92,14 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const nextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % catImages.length);
+  const changeImage = (direction) => {
+    setCurrentImageIndex((prevIndex) => {
+      if (direction === 'next') {
+        return (prevIndex + 1) % catImages.length;
+      } else {
+        return prevIndex === 0 ? catImages.length - 1 : prevIndex - 1;
+      }
+    });
   };
 
   return (
@@ -114,19 +133,29 @@ const Index = () => {
             />
           </AnimatePresence>
           <Button 
-            className="absolute bottom-4 right-4 bg-white/50 hover:bg-white/75"
-            onClick={nextImage}
+            className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/50 hover:bg-white/75"
+            onClick={() => changeImage('prev')}
           >
-            Next Image
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+          <Button 
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/50 hover:bg-white/75"
+            onClick={() => changeImage('next')}
+          >
+            <ChevronRight className="h-6 w-6" />
           </Button>
         </motion.div>
 
-        <Card className="mb-8">
+        <Card className="mb-8 bg-white/80 backdrop-blur-sm">
           <CardContent className="pt-6">
             <p className="text-xl text-gray-700 mb-4">
               Cats are fascinating creatures that have been domesticated for thousands of years. They are known for their independence, agility, and affectionate nature.
             </p>
-            <div className="flex justify-center items-center">
+            <motion.div 
+              className="flex justify-center items-center"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
               <Button 
                 variant="outline" 
                 className="flex items-center" 
@@ -135,15 +164,20 @@ const Index = () => {
                 <Heart className="mr-2" fill={likes > 0 ? "red" : "none"} color={likes > 0 ? "red" : "currentColor"} /> Like
               </Button>
               <span className="ml-2 text-lg font-semibold">{likes}</span>
-            </div>
+            </motion.div>
           </CardContent>
         </Card>
 
-        <div className="mb-8">
+        <motion.div 
+          className="mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <h2 className="text-2xl font-semibold mb-4">Cat Popularity</h2>
-          <Progress value={progress} className="w-full" />
-          <p className="text-center mt-2">Cats are loved by {progress}% of people worldwide!</p>
-        </div>
+          <Progress value={progress} className="w-full h-4 rounded-full" />
+          <p className="text-center mt-2 text-lg">Cats are loved by <span className="font-bold text-purple-600">{progress}%</span> of people worldwide!</p>
+        </motion.div>
 
         <Tabs defaultValue="characteristics" className="mb-8">
           <TabsList className="grid w-full grid-cols-2">
@@ -192,23 +226,33 @@ const Index = () => {
           </TabsContent>
         </Tabs>
 
-        <div className="mb-8">
+        <motion.div 
+          className="mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <h2 className="text-2xl font-semibold mb-4">Fun Cat Facts</h2>
           <FactCarousel />
-        </div>
+        </motion.div>
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline" className="w-full">
-                <Star className="mr-2" /> Cat Trivia
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
+        <Accordion type="single" collapsible className="mb-8">
+          <AccordionItem value="item-1">
+            <AccordionTrigger>Cat Trivia</AccordionTrigger>
+            <AccordionContent>
               <p>A cat's purr vibrates at a frequency of 25 to 150 Hz, which is beneficial for bone density and healing!</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Button variant="outline" className="w-full bg-gradient-to-r from-purple-400 to-pink-500 text-white border-none">
+            <Star className="mr-2" /> More Cat Facts
+          </Button>
+        </motion.div>
       </div>
     </div>
   );
