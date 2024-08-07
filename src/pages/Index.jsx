@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Cat, Heart, Info, Paw, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Cat, Heart, Info, Paw, Star, ChevronLeft, ChevronRight, Moon, Sun } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,6 +9,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Progress } from "@/components/ui/progress";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Switch } from "@/components/ui/switch";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const catBreeds = [
   { name: "Siamese", origin: "Thailand", temperament: "Vocal, Intelligent, Social", image: "https://upload.wikimedia.org/wikipedia/commons/2/25/Siam_lilacpoint.jpg" },
@@ -80,11 +82,21 @@ const Index = () => {
   const [likes, setLikes] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [progress, setProgress] = useState(13);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const catImages = [
     "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg",
     "https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg",
     "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Orange_tabby_cat_sitting_on_fallen_leaves-Hisashi-01A.jpg/1280px-Orange_tabby_cat_sitting_on_fallen_leaves-Hisashi-01A.jpg",
+  ];
+
+  const catPopulationData = [
+    { year: 2015, population: 530 },
+    { year: 2016, population: 552 },
+    { year: 2017, population: 580 },
+    { year: 2018, population: 600 },
+    { year: 2019, population: 625 },
+    { year: 2020, population: 650 },
   ];
 
   useEffect(() => {
@@ -103,16 +115,23 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100 p-8">
+    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-b from-purple-100 to-pink-100'} p-8 transition-colors duration-300`}>
       <div className="max-w-4xl mx-auto">
-        <motion.h1 
-          className="text-6xl font-bold mb-8 flex items-center justify-center text-purple-800"
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Cat className="mr-4 h-12 w-12" /> Feline Fascination
-        </motion.h1>
+        <div className="flex justify-between items-center mb-8">
+          <motion.h1 
+            className={`text-6xl font-bold flex items-center ${isDarkMode ? 'text-purple-300' : 'text-purple-800'}`}
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Cat className="mr-4 h-12 w-12" /> Feline Fascination
+          </motion.h1>
+          <div className="flex items-center">
+            <Sun className="h-4 w-4 mr-2" />
+            <Switch checked={isDarkMode} onCheckedChange={setIsDarkMode} />
+            <Moon className="h-4 w-4 ml-2" />
+          </div>
+        </div>
         
         <motion.div
           className="relative mb-8"
@@ -133,22 +152,22 @@ const Index = () => {
             />
           </AnimatePresence>
           <Button 
-            className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/50 hover:bg-white/75"
+            className={`absolute top-1/2 left-4 transform -translate-y-1/2 ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white/50 hover:bg-white/75'}`}
             onClick={() => changeImage('prev')}
           >
             <ChevronLeft className="h-6 w-6" />
           </Button>
           <Button 
-            className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/50 hover:bg-white/75"
+            className={`absolute top-1/2 right-4 transform -translate-y-1/2 ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white/50 hover:bg-white/75'}`}
             onClick={() => changeImage('next')}
           >
             <ChevronRight className="h-6 w-6" />
           </Button>
         </motion.div>
 
-        <Card className="mb-8 bg-white/80 backdrop-blur-sm">
+        <Card className={`mb-8 ${isDarkMode ? 'bg-gray-800' : 'bg-white/80 backdrop-blur-sm'}`}>
           <CardContent className="pt-6">
-            <p className="text-xl text-gray-700 mb-4">
+            <p className={`text-xl mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Cats are fascinating creatures that have been domesticated for thousands of years. They are known for their independence, agility, and affectionate nature.
             </p>
             <motion.div 
@@ -158,13 +177,31 @@ const Index = () => {
             >
               <Button 
                 variant="outline" 
-                className="flex items-center" 
+                className={`flex items-center ${isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : ''}`}
                 onClick={() => setLikes(likes + 1)}
               >
                 <Heart className="mr-2" fill={likes > 0 ? "red" : "none"} color={likes > 0 ? "red" : "currentColor"} /> Like
               </Button>
               <span className="ml-2 text-lg font-semibold">{likes}</span>
             </motion.div>
+          </CardContent>
+        </Card>
+
+        <Card className={`mb-8 ${isDarkMode ? 'bg-gray-800' : 'bg-white/80 backdrop-blur-sm'}`}>
+          <CardHeader>
+            <CardTitle>Cat Population Growth</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={catPopulationData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="year" />
+                <YAxis />
+                <RechartsTooltip />
+                <Legend />
+                <Line type="monotone" dataKey="population" stroke="#8884d8" activeDot={{ r: 8 }} />
+              </LineChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
@@ -249,7 +286,7 @@ const Index = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <Button variant="outline" className="w-full bg-gradient-to-r from-purple-400 to-pink-500 text-white border-none">
+          <Button variant="outline" className={`w-full ${isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gradient-to-r from-purple-400 to-pink-500'} text-white border-none`}>
             <Star className="mr-2" /> More Cat Facts
           </Button>
         </motion.div>
